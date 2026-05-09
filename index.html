@@ -497,6 +497,13 @@
   			hamburger.classList.remove('open');
   		}
   	});
+
+  	window.addEventListener('resize', () => {
+  		if (window.innerWidth > 1024) {
+  			aside.classList.remove('open');
+  			hamburger.classList.remove('open');
+  		}
+  	});
   </script>
   <script>
   	fetch('https://api.rss2json.com/v1/api.json?rss_url=https://rss.blog.naver.com/pridemars&count=10')

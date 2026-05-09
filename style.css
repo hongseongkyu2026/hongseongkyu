@@ -614,6 +614,14 @@ tbody tr:last-child {
 	width: auto;
 	}
 
+	aside a {
+		font-size: 1.1rem;
+	}
+
+	aside summary {
+		font-size: 1.1rem;
+	}
+
 	aside li {
 		border: none;
 	}
