@@ -520,7 +520,7 @@ tbody tr:last-child {
 	--swiper-navigation-size: 1rem;
 }
 
-.aside-donate {
+.hamburger-nav {
 	display: none;
 }
 
@@ -604,7 +604,17 @@ tbody tr:last-child {
 		margin: 7rem 0rem 6rem;
 	}
 
-	.aside-donate {
+	.hamburger-nav {
 		display: list-item;
+	}
+
+	aside a img {
+		margin-top: 1.5rem;
+	height: 2em;
+	width: auto;
+	}
+
+	aside li {
+		border: none;
 	}
 }
