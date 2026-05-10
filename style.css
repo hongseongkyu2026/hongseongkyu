@@ -543,6 +543,7 @@ tbody tr:last-child {
 	text-decoration: none;
 	color: inherit;
 	flex: 1;
+	word-break: normal;
 }
 
 #press-list a:hover {
