@@ -337,6 +337,10 @@ tbody td a {
 	color: inherit;
 }
 
+tbody td a:hover {
+	text-decoration: underline;
+}
+
 tbody tr {
 	border-bottom: 1px solid #e5e5e5;
 }
