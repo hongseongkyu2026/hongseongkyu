@@ -42,28 +42,11 @@
       <button class="add-btn" onclick="addItem()">+ 일정 추가</button>
     </div>
 
-    <div class="fsec">
-      <h3>후원 정보</h3>
-      <div class="fg">
-        <label>은행명</label>
-        <input id="f-bank" type="text" value="우리은행" oninput="updatePreview()">
-      </div>
-      <div class="fg">
-        <label>계좌번호</label>
-        <input id="f-acc" type="text" value="1005-104-916540" oninput="updatePreview()">
-      </div>
-      <div class="fg">
-        <label>후원회명</label>
-        <input id="f-org" type="text" value="경기도지사예비후보자 홍성규후원회" oninput="updatePreview()">
-      </div>
-    </div>
-
     <button class="export-btn" id="export-btn" onclick="exportPng()">PNG 저장</button>
   </div>
 
   <!-- ── 미리보기 패널 ── -->
   <div id="preview-panel">
-    <p>미리보기 (실제 PNG는 2배 해상도)</p>
 
     <div id="schedule-card">
 
@@ -111,8 +94,12 @@
 
       <!-- 하단 후원 정보 -->
       <div class="card-footer">
-        <span class="support-btn">♥ 후원안내</span>
-        <span class="support-text" id="p-footer"></span>
+        <div class="support-btn">
+          <p>♥ 후원안내</p>
+        </div>
+        <div class="support-text">
+          <p><span class="bank">우리은행 | </span>1005-104-916540<span class="bank"> (경기도지사예비후보자 홍성규후원회)</span></p>
+        </div>
       </div>
 
     </div>
@@ -129,10 +116,13 @@
   ];
 
   // ── 일정 항목 폼 렌더링 ──
+  let dragSrcIndex = null;
+
   function renderScheduleInputs() {
     const container = document.getElementById('schedule-inputs');
     container.innerHTML = scheduleItems.map((item, i) => `
-      <div class="sif">
+      <div class="sif" draggable="true" data-index="${i}" style="cursor: grab;">
+        <div style="font-size:10px; color:#bbb; margin-bottom:5px; user-select:none;">⠿ 드래그로 순서 변경</div>
         <button class="remove-btn" onclick="removeItem(${i})">✕</button>
         <div class="fg">
           <label>시간</label>
@@ -140,7 +130,7 @@
         </div>
         <div class="fg">
           <label>일정명</label>
-          <input type="text" value="${item.title}" oninput="scheduleItems[${i}].title = this.value; updatePreview()">
+          <textarea rows="2" oninput="scheduleItems[${i}].title = this.value; updatePreview()" style="width:100%; padding:6px 9px; border:1px solid #ddd; border-radius:6px; font-size:12px; font-family:inherit; color:#111; resize:none;">${item.title}</textarea>
         </div>
         <div class="fg">
           <label>장소</label>
@@ -148,6 +138,34 @@
         </div>
       </div>
     `).join('');
+
+    container.querySelectorAll('.sif').forEach(el => {
+      el.addEventListener('dragstart', e => {
+        dragSrcIndex = parseInt(el.dataset.index);
+        el.style.opacity = '0.4';
+      });
+      el.addEventListener('dragend', () => {
+        el.style.opacity = '1';
+      });
+      el.addEventListener('dragover', e => {
+        e.preventDefault();
+        el.style.outline = '2px dashed #e8202a';
+      });
+      el.addEventListener('dragleave', () => {
+        el.style.outline = '';
+      });
+      el.addEventListener('drop', e => {
+        e.preventDefault();
+        el.style.outline = '';
+        const targetIndex = parseInt(el.dataset.index);
+        if (dragSrcIndex === null || dragSrcIndex === targetIndex) return;
+        const [moved] = scheduleItems.splice(dragSrcIndex, 1);
+        scheduleItems.splice(targetIndex, 0, moved);
+        dragSrcIndex = null;
+        renderScheduleInputs();
+        updatePreview();
+      });
+    });
   }
 
   function addItem() {
@@ -173,14 +191,11 @@
       <div class="schedule-row">
         <div class="schedule-time">${item.time}</div>
         <div class="schedule-details">
-          <div class="schedule-title">${item.title}</div>
-          ${item.loc ? `<div class="schedule-location">&#x1F4CD; ${item.loc}</div>` : ''}
+          <div class="schedule-title">${item.title.replace(/\n/g, '<br>')}</div>
+          ${item.loc ? `<div class="schedule-location"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23.77 28.69" style="width:1em;height:1em;flex-shrink:0;"><path fill="#231815" d="M17.85,1.59c1.82,1.06,3.26,2.5,4.32,4.32s1.59,3.8,1.59,5.94c0,1.62-.31,3.16-.93,4.61s-1.47,2.71-2.57,3.81l-8.39,8.41L3.49,20.25c-1.09-1.08-1.95-2.34-2.57-3.79s-.93-2.97-.93-4.58c0-2.16.53-4.14,1.59-5.96S4.1,2.66,5.92,1.59s3.81-1.59,5.96-1.59,4.14.53,5.96,1.59ZM7.04,3.63c-1.45.83-2.58,1.96-3.41,3.41s-1.24,3.06-1.24,4.84c0,1.33.24,2.55.71,3.68s1.17,2.13,2.07,3.02l6.7,6.73,6.7-6.7c.91-.91,1.6-1.92,2.07-3.05s.71-2.35.71-3.68c0-1.78-.41-3.39-1.24-4.84s-1.96-2.58-3.41-3.41-3.06-1.24-4.84-1.24-3.39.41-4.84,1.24ZM9.7,10.63c.23-.38.54-.69.93-.93s.8-.35,1.25-.35.87.12,1.25.35.69.54.93.93.35.8.35,1.25-.12.87-.35,1.25-.54.69-.93.93-.8.35-1.25.35-.87-.12-1.25-.35-.69-.54-.93-.93-.35-.8-.35-1.25.12-.87.35-1.25Z"/></svg> ${item.loc}</div>` : ''}
         </div>
       </div>
     `).join('');
-
-    document.getElementById('p-footer').innerHTML =
-      `${val('f-bank')} | ${val('f-acc')}<br>(${val('f-org')})`;
   }
 
   // ── 이미지 로드 ──
