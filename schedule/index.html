@@ -187,7 +187,7 @@
     document.getElementById('p-date').textContent = val('f-date');
     document.getElementById('p-dday').textContent = val('f-dday');
 
-    document.getElementById('p-schedule').innerHTML = scheduleItems.map(item => `
+    document.getElementById('p-schedule').innerHTML = scheduleItems.map((item, i) => `
       <div class="schedule-row">
         <div class="schedule-time">${item.time}</div>
         <div class="schedule-details">
@@ -195,21 +195,49 @@
           ${item.loc ? `<div class="schedule-location"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23.77 28.69" style="width:1em;height:1em;flex-shrink:0;vertical-align:middle;"><path fill="#231815" d="M17.85,1.59c1.82,1.06,3.26,2.5,4.32,4.32s1.59,3.8,1.59,5.94c0,1.62-.31,3.16-.93,4.61s-1.47,2.71-2.57,3.81l-8.39,8.41L3.49,20.25c-1.09-1.08-1.95-2.34-2.57-3.79s-.93-2.97-.93-4.58c0-2.16.53-4.14,1.59-5.96S4.1,2.66,5.92,1.59s3.81-1.59,5.96-1.59,4.14.53,5.96,1.59ZM7.04,3.63c-1.45.83-2.58,1.96-3.41,3.41s-1.24,3.06-1.24,4.84c0,1.33.24,2.55.71,3.68s1.17,2.13,2.07,3.02l6.7,6.73,6.7-6.7c.91-.91,1.6-1.92,2.07-3.05s.71-2.35.71-3.68c0-1.78-.41-3.39-1.24-4.84s-1.96-2.58-3.41-3.41-3.06-1.24-4.84-1.24-3.39.41-4.84,1.24ZM9.7,10.63c.23-.38.54-.69.93-.93s.8-.35,1.25-.35.87.12,1.25.35.69.54.93.93.35.8.35,1.25-.12.87-.35,1.25-.54.69-.93.93-.8.35-1.25.35-.87-.12-1.25-.35-.69-.54-.93-.93-.35-.8-.35-1.25.12-.87.35-1.25Z"/></svg> ${item.loc}</div>` : ''}
         </div>
       </div>
-    `).join('');
+      ${i < scheduleItems.length - 1 ? '<div class="schedule-sep"></div>' : ''}
+        `).join('');
   }
 
   // ── 이미지 로드 ──
   function loadImage(input) {
-    if (!input.files || !input.files[0]) return;
-    const reader = new FileReader();
-    reader.onload = e => {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const original = new Image();
+    original.onload = () => {
+      const targetRatio = 16 / 9;
+      const srcRatio = original.width / original.height;
+
+      let sx, sy, sw, sh;
+      if (srcRatio > targetRatio) {
+        // 원본이 더 넓음 → 좌우 크롭
+        sh = original.height;
+        sw = sh * targetRatio;
+        sx = (original.width - sw) / 2;
+        sy = 0;
+      } else {
+        // 원본이 더 좁음 → 상하 크롭
+        sw = original.width;
+        sh = sw / targetRatio;
+        sx = 0;
+        sy = (original.height - sh) / 2;
+      }
+
+      const c = document.createElement('canvas');
+      c.width = 1600;
+      c.height = 900;
+      c.getContext('2d').drawImage(original, sx, sy, sw, sh, 0, 0, 1600, 900);
+
       const img = document.getElementById('header-img');
-      img.src = e.target.result;
+      img.src = c.toDataURL('image/png');
       img.style.display = 'block';
       document.getElementById('header-placeholder').style.display = 'none';
     };
-    reader.readAsDataURL(input.files[0]);
-  }
+    original.src = e.target.result;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
 
   // ── PNG 내보내기 ──
   async function exportPng() {
