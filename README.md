@@ -48,3 +48,6 @@
 
 ## 만든 사람
 - 정의석, 2026
+- [yangpaus29@gmail.com](mailto:yangpaus29@gmail.com)
+- [instagram](https://instagram.com/yangpaus/)
+- [website](https://yangpaus.neocities.org)
