@@ -352,6 +352,10 @@ body {
   border-radius: 8px;
 }
 
+.vote img {
+  width: 100%;
+}
+
 /* 하단 후원 정보 */
 
 .card-footer {
