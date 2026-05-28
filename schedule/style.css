@@ -352,6 +352,10 @@ body {
   border-radius: 8px;
 }
 
+.vote {
+  margin-top: 22px;
+}
+
 .vote img {
   width: 100%;
 }
